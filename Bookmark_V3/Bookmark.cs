@@ -349,26 +349,31 @@ namespace Bookmark_V3
                 RegularBookTitleLabel.Text = "";
                 RegularBorrowedLabel.Text = "";
             }
+            //getting Book title based on book accession number
+            if (!database.Get("BOOKMARK_DB.sqlite", "BOOKS", "Accno", RBookAccnoBox.Text, "Title")) MessageBox.Show(database.error_message); else RegularBookTitleLabel.Text = database.Result;
+            //getting Book USN(of the student who borrowd it) based on book accession number
+            if (!database.Get("BOOKMARK_DB.sqlite", "BOOKS", "Accno", RBookAccnoBox.Text, "USN"))  MessageBox.Show(database.error_message); else RegularBorrowedLabel.Text = database.Result;
+            
 
-            sql = "SELECT * FROM BOOKS WHERE Accno = '" + RBookAccnoBox.Text + "'";
-            using (var connection = new SQLiteConnection("Data Source=BOOKMARK_DB.sqlite;Version=3;New=True;Compress=True;"))
-            {
-                connection.Open();
-                using (var command = new SQLiteCommand(sql, connection))
-                {
-                    using (var reader = command.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            RegularBookTitleLabel.Text = reader["Title"].ToString();
-                            RegularBorrowedLabel.Text = reader["USN"].ToString();
-                        }
-                        reader.Close();
-                    }
-                    command.Dispose();
-                }
-                connection.Close();
-            }// closing using
+            ////sql = "SELECT * FROM BOOKS WHERE Accno = '" + RBookAccnoBox.Text + "'";
+            ////using (var connection = new SQLiteConnection("Data Source=BOOKMARK_DB.sqlite;Version=3;New=True;Compress=True;"))
+            ////{
+            ////    connection.Open();
+            ////    using (var command = new SQLiteCommand(sql, connection))
+            ////    {
+            ////        using (var reader = command.ExecuteReader())
+            ////        {
+            ////            while (reader.Read())
+            ////            {
+            ////                RegularBookTitleLabel.Text = reader["Title"].ToString();
+            ////                RegularBorrowedLabel.Text = reader["USN"].ToString();
+            ////            }
+            ////            reader.Close();
+            ////        }
+            ////        command.Dispose();
+            ////    }
+            ////    connection.Close();
+            ////}// closing using
         }
 
         private void RSSearchBtn_Click(object sender, EventArgs e)
@@ -385,27 +390,34 @@ namespace Bookmark_V3
                 string temp = RUSNBox.Text.Substring(0, 7);
                 string temp1 = RUSNBox.Text;
                 TableName = "STUDENTS_" + temp;
-                sql = "SELECT * FROM " + TableName + "  WHERE USN = '" + RUSNBox.Text + "'";
-                using (var connection = new SQLiteConnection("Data Source=BOOKMARK_DB.sqlite;Version=3;New=True;Compress=True;"))
-                {
-                    connection.Open();
-                    using (var command = new SQLiteCommand(sql, connection))
-                    {
-                        using (var reader = command.ExecuteReader())
-                        {
-                            while (reader.Read())
-                            {
-                                RegularStudentNameLabel.Text = reader["SName"].ToString();
-                                RegularBook1IdLabel.Text = reader["B1"].ToString();
-                                RegularBook2IdLabel.Text = reader["B2"].ToString();
-                            }
-                            reader.Close();
-                        }
-                        command.Dispose();
-                    }
-                    connection.Close();
-                }// closing using
-                try
+                //getting Student name based on usn
+                if (!database.Get("BOOKMARK_DB.sqlite", TableName, "USN", RUSNBox.Text, "SName")) MessageBox.Show(database.error_message); else this.RegularStudentNameLabel.Text = database.Result;
+                //getting Student Book_1 ID based on usn
+                if (!database.Get("BOOKMARK_DB.sqlite", TableName, "USN", RUSNBox.Text, "B1")) MessageBox.Show(database.error_message); else this.RegularBook1IdLabel.Text = database.Result;
+                //getting Student Book_1 ID based on usn
+                if (!database.Get("BOOKMARK_DB.sqlite", TableName, "USN", RUSNBox.Text, "B2")) MessageBox.Show(database.error_message); else this.RegularBook2IdLabel.Text = database.Result;
+
+                //////sql = "SELECT * FROM " + TableName + "  WHERE USN = '" + RUSNBox.Text + "'";
+                //////using (var connection = new SQLiteConnection("Data Source=BOOKMARK_DB.sqlite;Version=3;New=True;Compress=True;"))
+                //////{
+                //////    connection.Open();
+                //////    using (var command = new SQLiteCommand(sql, connection))
+                //////    {
+                //////        using (var reader = command.ExecuteReader())
+                //////        {
+                //////            while (reader.Read())
+                //////            {
+                //////                RegularStudentNameLabel.Text = reader["SName"].ToString();
+                //////                RegularBook1IdLabel.Text = reader["B1"].ToString();
+                //////                RegularBook2IdLabel.Text = reader["B2"].ToString();
+                //////            }
+                //////            reader.Close();
+                //////        }
+                //////        command.Dispose();
+                //////    }
+                //////    connection.Close();
+                //////}// closing using
+                try//?what does this block of code do
                 {
                     string query = "SELECT * FROM " + TableName + " WHERE USN='" + RUSNBox.Text + "';";
                     sql = @"Data Source=BOOKMARK_DB.sqlite;Version=3;New=True;Compress=True;";
@@ -425,11 +437,13 @@ namespace Bookmark_V3
                     {
                         MessageBox.Show("Image Error\n");
                     }
+                    reader.Close();
+                    cmd.Dispose();
                     con.Close();
                 }
                 catch
                 {
-                    MessageBox.Show("Error\n");
+                    MessageBox.Show("Image Error\n");
                 }
             }      
         }

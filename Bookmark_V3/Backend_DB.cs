@@ -1,7 +1,23 @@
 ﻿using System;
 using System.Data;
 using System.Data.SQLite;
+/*
+ * certain formatts of using this class
+ * 
+ 
+            if(!database.Get("BOOKMARK_DB.sqlite", "SYSTEM","Id","13", "Value")) MessageBox.Show(database.error_message);
+            else this.LogUserLabel.Text = database.Result;
+            
+            
 
+
+
+
+
+
+
+ * 
+ * */
 namespace Bookmark_V3
 {
     class Backend_DB
