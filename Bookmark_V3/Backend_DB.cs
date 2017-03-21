@@ -8,7 +8,7 @@ using System.Data.SQLite;
             if(!database.Get("BOOKMARK_DB.sqlite", "SYSTEM","Id","13", "Value")) MessageBox.Show(database.error_message);
             else this.LogUserLabel.Text = database.Result;
             
-            
+            if (!database.Update("BOOKMARK_DB.sqlite", "BOOKS", "USN", RUSNBox.Text, "Accno", RBookAccnoBox.Text)) MessageBox.Show(database.error_message);
 
 
 
@@ -269,27 +269,15 @@ namespace Bookmark_V3
             return Insert("BOOKMARK_DB.sqlite", "INSERT INTO " + TableName + "(USN,SName,Sphno,Semester,B1,B2,BB1,BB2,BB3,BB4,BB5,BB6,BB7,BB8,BB9,BB10,BB11,BB12,BB13,BB14,Sphoto) VALUES('" + Parameter1 + "','" + Parameter2 + "','" + Parameter3 + "','" + Parameter4 + "','" + Parameter5 + "','" + Parameter6 + "','" + Parameter7 + "','" + Parameter8 + "','" + Parameter9 + "','" + Parameter10 + "','" + Parameter11 + "','" + Parameter12 + "','" + Parameter13 + "','" + Parameter14 + "','" + Parameter15 + "','" + Parameter16 + "','" + Parameter17 + "','" + Parameter18 + "','" + Parameter19 + "','" + Parameter20 + "','" + pic + "');");
         }
 
-       /*
-        
-        *
-        *
-        * 
-        * 
-        * 
-        * 
-        * 
-        * 
-        * 
-        
-             */
-        public  Boolean Update(String Table_Name, String UpdateColumn, String parameter, String ConstrainColum, String ConstrainParameter)
+       
+        public  Boolean Update(String source,String Table_Name, String UpdateColumn, String parameter, String ConstrainColum, String ConstrainParameter)
         {
             // This function is used to update data in the database
             sql = "UPDATE "+ Table_Name + " SET "+UpdateColumn+" = '" + parameter + "' WHERE "+ConstrainColum+" = '" +ConstrainParameter+ "'";
-
+            
             try
             {
-                using (var connection = new SQLiteConnection("Data Source=BOOKMARK_DB.sqlite;Version=3;New=True;Compress=True;"))
+                using (var connection = new SQLiteConnection("Data Source="+ source + ";Version=3;New=True;Compress=True;"))
                 {
                     connection.Open();
                     using (var command = new SQLiteCommand(sql, connection))
@@ -308,14 +296,14 @@ namespace Bookmark_V3
             }
             return true;
         }
-        public  Boolean Update(String Table_Name, String UpdateColumn1, String parameter1, String UpdateColumn2, String parameter2, String ConstrainColum1, String ConstrainParameter1, String ConstrainColum2, String ConstrainParameter2)
+        public  Boolean Update(String source,String Table_Name, String UpdateColumn1, String parameter1, String UpdateColumn2, String parameter2, String ConstrainColum1, String ConstrainParameter1, String ConstrainColum2, String ConstrainParameter2)
         {
             // This function is used to update data in the database
             sql = "UPDATE "+Table_Name+" SET "+ UpdateColumn1 + "='" + parameter1 + "',"+ UpdateColumn2 + "='" + parameter2 + "' WHERE "+ ConstrainColum1 + "='" + ConstrainParameter1 + "' AND "+ ConstrainColum2 + "='" + ConstrainParameter2 + "';";
 
             try
             {
-                using (var connection = new SQLiteConnection("Data Source=BOOKMARK_DB.sqlite;Version=3;New=True;Compress=True;"))
+                using (var connection = new SQLiteConnection("Data Source=" + source + ";Version=3;New=True;Compress=True;"))
                 {
                     connection.Open();
                     using (var command = new SQLiteCommand(sql, connection))

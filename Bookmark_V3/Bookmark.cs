@@ -465,68 +465,100 @@ namespace Bookmark_V3
                 //check if book already is issued
                 try
                 {
-                    sql = "SELECT * FROM BOOKS WHERE Accno = '" + RBookAccnoBox.Text + "'";
-                    using (var connection = new SQLiteConnection("Data Source=BOOKMARK_DB.sqlite;Version=3;New=True;Compress=True;"))
-                    {
-                        connection.Open();
-                        using (var command = new SQLiteCommand(sql, connection))
-                        {
-                            using (var reader = command.ExecuteReader())
-                            {
-                                while (reader.Read())
-                                {
-                                    usn = reader["USN"].ToString();
-                                    if (reader["USN"].ToString().Equals("")&& reader["FName"].ToString().Equals(""))
-                                        flag = true;
-                                }
-                                reader.Close();
-                            }
-                            command.Dispose();
-                        }
-                        connection.Close();
-                    }// closing using
+
+                    
+                    if (!database.Get("BOOKMARK_DB.sqlite", "BOOKS", "Accno", RBookAccnoBox.Text, "USN")) MessageBox.Show(database.error_message); else usn = database.Result;
+                    if (!database.Get("BOOKMARK_DB.sqlite", "BOOKS", "Accno", RBookAccnoBox.Text, "FName")) MessageBox.Show(database.error_message);// the else part as in above statement is not necessary here. the value of database.Result is directly used in the next line below
+
+                    if (usn.Equals("") && database.Result.Equals(""))//NOTE: here the value of database.Result is the value of FName according to the querry that was just previously made.
+                        flag = true;
+
+                    //////sql = "SELECT * FROM  WHERE Accno = '" + RBookAccnoBox.Text + "'";
+                    //////using (var connection = new SQLiteConnection("Data Source=BOOKMARK_DB.sqlite;Version=3;New=True;Compress=True;"))
+                    //////{
+                    //////    connection.Open();
+                    //////    using (var command = new SQLiteCommand(sql, connection))
+                    //////    {
+                    //////        using (var reader = command.ExecuteReader())
+                    //////        {
+                    //////            while (reader.Read())
+                    //////            {
+                    //////                usn = reader["USN"].ToString();
+                    //////                if (reader["USN"].ToString().Equals("")&& reader["FName"].ToString().Equals(""))
+                    //////                    flag = true;
+                    //////            }
+                    //////            reader.Close();
+                    //////        }
+                    //////        command.Dispose();
+                    //////    }
+                    //////    connection.Close();
+                    //////}// closing using
                     if (flag == false)
                     {
                         MessageBox.Show("BOOK IS ALREADY ISSUED.\n PLEASE RETURN IT BEFORE ISSUING TO ANOTHER STUDENT");
                         return;
                     }
+                    
+                    String temp_b1="some value other than null", temp_b2= "some value other than null";
+                    if (!database.Get("BOOKMARK_DB.sqlite", TableName, "USN", RUSNBox.Text, "B1")) MessageBox.Show(database.error_message); else temp_b1 = database.Result;
+                    if (!database.Get("BOOKMARK_DB.sqlite", TableName, "USN", RUSNBox.Text, "B2")) MessageBox.Show(database.error_message); else temp_b2 = database.Result;
 
-                    sql = "SELECT * FROM "+TableName+" WHERE USN = '" + RUSNBox.Text + "'";
-                    using (var connection = new SQLiteConnection("Data Source=BOOKMARK_DB.sqlite;Version=3;New=True;Compress=True;"))
+                    if (temp_b1.Equals(""))
                     {
-                        connection.Open();
-                        using (var command = new SQLiteCommand(sql, connection))
-                        {
-                            using (var reader = command.ExecuteReader())
-                            {
-                                while (reader.Read())
-                                {
-                                    if (reader["B1"].ToString().Equals(""))
-                                    {
-                                        flag = true;
-                                        tflag = 1;
-                                        book = reader["B1"].ToString();
-                                        break;
-                                    }
-                                    else if (reader["B2"].ToString().Equals(""))
-                                    {
-                                        flag = true;
-                                        tflag = 2;
-                                        book = reader["B2"].ToString();
-                                        break;
-                                    }
-                                    else if (!reader["B1"].ToString().Equals(null)&& !reader["B2"].ToString().Equals(null))
-                                    {
-                                        tflag = 3;
-                                        break;
-                                    }
-                                }
-                                reader.Close();
-                            }
-                            command.Dispose();
-                        }
-                        connection.Close();
-                    }// closing using
+                        flag = true;
+                        tflag = 1;
+                        book = temp_b1.ToString();
+
+                    }
+                    else if (temp_b2.ToString().Equals(""))
+                    {
+                        flag = true;
+                        tflag = 2;
+                        book = temp_b2.ToString();
+
+                    }
+                    else if (!temp_b1.ToString().Equals(null) && !temp_b2.ToString().Equals(null))
+                    {
+                        tflag = 3;
+                    }
+
+
+                    ////////sql = "SELECT * FROM "+TableName+" WHERE USN = '" + RUSNBox.Text + "'";
+                    ////////using (var connection = new SQLiteConnection("Data Source=BOOKMARK_DB.sqlite;Version=3;New=True;Compress=True;"))
+                    ////////{
+                    ////////    connection.Open();
+                    ////////    using (var command = new SQLiteCommand(sql, connection))
+                    ////////    {
+                    ////////        using (var reader = command.ExecuteReader())
+                    ////////        {
+                    ////////            while (reader.Read())
+                    ////////            {
+                    ////////                if (reader["B1"].ToString().Equals(""))
+                    ////////                {
+                    ////////                    flag = true;
+                    ////////                    tflag = 1;
+                    ////////                    book = reader["B1"].ToString();
+                    ////////                    break;
+                    ////////                }
+                    ////////                else if (reader["B2"].ToString().Equals(""))
+                    ////////                {
+                    ////////                    flag = true;
+                    ////////                    tflag = 2;
+                    ////////                    book = reader["B2"].ToString();
+                    ////////                    break;
+                    ////////                }
+                    ////////                else if (!reader["B1"].ToString().Equals(null)&& !reader["B2"].ToString().Equals(null))
+                    ////////                {
+                    ////////                    tflag = 3;
+                    ////////                    break;
+                    ////////                }
+                    ////////            }
+                    ////////            reader.Close();
+                    ////////        }
+                    ////////        command.Dispose();
+                    ////////    }
+                    ////////    connection.Close();
+                    ////////}// closing using
                    
                     if (tflag == 3)
                     {
@@ -534,46 +566,55 @@ namespace Bookmark_V3
                         return;
                     }
 
-                    sql = "UPDATE BOOKS SET USN = '" + RUSNBox.Text + "' WHERE Accno = '" + RBookAccnoBox.Text + "'";
-                    using (var connection = new SQLiteConnection("Data Source=BOOKMARK_DB.sqlite;Version=3;New=True;Compress=True;"))
-                    {
-                        connection.Open();
-                        using (var command = new SQLiteCommand(sql, connection))
-                        {
-                            command.ExecuteNonQuery();
-                            command.Dispose();
-                        }
-                        connection.Close();
-                    }
+
+
+
+                    if (!database.Update("BOOKMARK_DB.sqlite", "BOOKS", "USN", RUSNBox.Text, "Accno", RBookAccnoBox.Text)) MessageBox.Show(database.error_message);
+
+                    //////sql = "UPDATE BOOKS SET USN = '" + RUSNBox.Text + "' WHERE Accno = '" + RBookAccnoBox.Text + "'";
+                    //////using (var connection = new SQLiteConnection("Data Source=BOOKMARK_DB.sqlite;Version=3;New=True;Compress=True;"))
+                    //////{
+                    //////    connection.Open();
+                    //////    using (var command = new SQLiteCommand(sql, connection))
+                    //////    {
+                    //////        command.ExecuteNonQuery();
+                    //////        command.Dispose();
+                    //////    }
+                    //////    connection.Close();
+                    //////}
 
                     if (tflag == 1)
-                        sql = "UPDATE "+TableName+ " SET B1 ='" + RBookAccnoBox.Text + "' WHERE USN = '" + RUSNBox.Text + "'";
+                        if (!database.Update("BOOKMARK_DB.sqlite", TableName, " B1", RBookAccnoBox.Text, "USN", RUSNBox.Text)) MessageBox.Show(database.error_message);
+                    //////sql = "UPDATE "+TableName+ " SET B1 ='" + RBookAccnoBox.Text + "' WHERE USN = '" + RUSNBox.Text + "'";
                     if (tflag == 2)
-                        sql = "UPDATE " + TableName + " SET B2 ='" + RBookAccnoBox.Text + "' WHERE USN = '" + RUSNBox.Text + "'";
-                    using (var connection = new SQLiteConnection("Data Source=BOOKMARK_DB.sqlite;Version=3;New=True;Compress=True;"))
-                    {
-                        connection.Open();
-                        using (var command = new SQLiteCommand(sql, connection))
-                        {
-                            command.ExecuteNonQuery();
-                            command.Dispose();
-                        }
-                        connection.Close();
-                    }
+                        if (!database.Update("BOOKMARK_DB.sqlite", TableName, " B2", RBookAccnoBox.Text, "USN", RUSNBox.Text)) MessageBox.Show(database.error_message);
+                    //////sql = "UPDATE " + TableName + " SET B2 ='" + RBookAccnoBox.Text + "' WHERE USN = '" + RUSNBox.Text + "'";
+                    //////using (var connection = new SQLiteConnection("Data Source=BOOKMARK_DB.sqlite;Version=3;New=True;Compress=True;"))
+                    //////{
+                    //////    connection.Open();
+                    //////    using (var command = new SQLiteCommand(sql, connection))
+                    //////    {
+                    //////        command.ExecuteNonQuery();
+                    //////        command.Dispose();
+                    //////    }
+                    //////    connection.Close();
+                    //////}
                     MessageBox.Show("BOOK ISSUED SUCESSFULLY");
-                    RBSearchBtn_Click(sender, e);
-                    RSSearchBtn_Click(sender, e);
-                    string sql1 = "INSERT INTO TRANSACTIONS (Issued_User,USN,Book_Id,Issue_date,Expected_return_date) VALUES ('" + LogUserLabel.Text + "','" + RUSNBox.Text + "','" + RBookAccnoBox.Text + "','" + DateTime.Now.ToShortDateString() + "','" + DateTime.Now.AddDays(Return).ToShortDateString() + "');";
-                    using (var connection = new SQLiteConnection("Data Source=BOOKMARK_DB.sqlite;Version=3;New=True;Compress=True;"))
-                    {
-                        connection.Open();
-                        using (var command = new SQLiteCommand(sql1, connection))
-                        {
-                            command.ExecuteNonQuery();
-                            command.Dispose();
-                        }
-                        connection.Close();
-                    }    
+                    RBSearchBtn_Click(sender, e);//?
+                    RSSearchBtn_Click(sender, e);//?
+
+                    if (!database.Insert("TRANSACTIONS",LogUserLabel.Text, RUSNBox.Text, RBookAccnoBox.Text, DateTime.Now.ToShortDateString(), DateTime.Now.AddDays(Return).ToShortDateString(),null,null,null)) MessageBox.Show(database.error_message);
+                    ////////string sql1 = "INSERT INTO TRANSACTIONS (Issued_User,USN,Book_Id,Issue_date,Expected_return_date) VALUES ('" + LogUserLabel.Text + "','" + RUSNBox.Text + "','" + RBookAccnoBox.Text + "','" + DateTime.Now.ToShortDateString() + "','" + DateTime.Now.AddDays(Return).ToShortDateString() + "');";
+                    ////////using (var connection = new SQLiteConnection("Data Source=BOOKMARK_DB.sqlite;Version=3;New=True;Compress=True;"))
+                    ////////{
+                    ////////    connection.Open();
+                    ////////    using (var command = new SQLiteCommand(sql1, connection))
+                    ////////    {
+                    ////////        command.ExecuteNonQuery();
+                    ////////        command.Dispose();
+                    ////////    }
+                    ////////    connection.Close();
+                    ////////}    
                 }
                 catch 
                 {
