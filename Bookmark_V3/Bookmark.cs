@@ -67,7 +67,7 @@ namespace Bookmark_V3
             {
                 this.LogUserLabel.Text = database.Result;
             }
-                    
+                     
 
 
             Time_Date_Timer.Interval = 1000;
@@ -643,68 +643,97 @@ namespace Bookmark_V3
                     MessageBox.Show("Please select a student");
                 else//all data is entered in the respective boxes
                 {
-                    sql = "SELECT * FROM BOOKS WHERE Accno = '" + RBookAccnoBox.Text + "'";
-                    using (var connection = new SQLiteConnection("Data Source=BOOKMARK_DB.sqlite;Version=3;New=True;Compress=True;"))
-                    {
-                        connection.Open();
-                        using (var command = new SQLiteCommand(sql, connection))
-                        {
-                            using (var reader = command.ExecuteReader())
-                            {
-                                while (reader.Read())
-                                {
-                                    usn = reader["USN"].ToString();
-                                    if (reader["USN"].ToString().Equals("") && reader["FName"].ToString().Equals(""))
-                                        flag = true;//book is not issued to anyone 
-                                }
-                                reader.Close();
-                            }
-                            command.Dispose();
-                        }
-                        connection.Close();
-                    }// closing using
+
+                    if (!database.Get("BOOKMARK_DB.sqlite", "BOOKS", "Accno", RBookAccnoBox.Text, "USN")) MessageBox.Show(database.error_message);else usn = database.Result;
+                    String tfname="Some Random Value";
+                    if (!database.Get("BOOKMARK_DB.sqlite", "BOOKS", "Accno", RBookAccnoBox.Text, "USN")) MessageBox.Show(database.error_message);else tfname = database.Result;
+                    if (usn.Equals("") && tfname.ToString().Equals(""))
+                        flag = true;//book is not issued to anyone 
+
+                    //////////sql = "SELECT * FROM BOOKS WHERE Accno = '" + RBookAccnoBox.Text + "'";
+                    //////////using (var connection = new SQLiteConnection("Data Source=BOOKMARK_DB.sqlite;Version=3;New=True;Compress=True;"))
+                    //////////{
+                    //////////    connection.Open();
+                    //////////    using (var command = new SQLiteCommand(sql, connection))
+                    //////////    {
+                    //////////        using (var reader = command.ExecuteReader())
+                    //////////        {
+                    //////////            while (reader.Read())
+                    //////////            {
+                    //////////                usn = reader["USN"].ToString();
+                    //////////                if (reader["USN"].ToString().Equals("") && reader["FName"].ToString().Equals(""))
+                    //////////                    flag = true;//book is not issued to anyone 
+                    //////////            }
+                    //////////            reader.Close();
+                    //////////        }
+                    //////////        command.Dispose();
+                    //////////    }
+                    //////////    connection.Close();
+                    //////////}// closing using
                     if (flag == true)
                     {
                         MessageBox.Show("BOOK IS NOT ISSUED TO ANYONE");
                         return;
                     }
-
-                    sql = "SELECT * FROM " + TableName + " WHERE USN = '" + RUSNBox.Text + "'";
-                    using (var connection = new SQLiteConnection("Data Source=BOOKMARK_DB.sqlite;Version=3;New=True;Compress=True;"))
+                    String tb1="", tb2="";
+                    if (!database.Get("BOOKMARK_DB.sqlite", TableName, "USN", RUSNBox.Text, "B1")) MessageBox.Show(database.error_message); else tb1 = database.Result;
+                    if (!database.Get("BOOKMARK_DB.sqlite", TableName, "USN", RUSNBox.Text, "B2")) MessageBox.Show(database.error_message); else tb2 = database.Result;
+                    if ((tb1.Equals(RBookAccnoBox.Text)))
                     {
-                        connection.Open();
-                        using (var command = new SQLiteCommand(sql, connection))
-                        {
-                            using (var reader = command.ExecuteReader())
-                            {
-                                while (reader.Read())
-                                {
-                                    if ((reader["B1"].ToString().Equals(RBookAccnoBox.Text)))
-                                    {
-                                        tflag = 1;
-                                        book = reader["B1"].ToString();
-                                        break;
-                                    }
-                                    else if ((reader["B2"].ToString().Equals(RBookAccnoBox.Text)))
-                                    {
-                                        tflag = 2;
-                                        book = reader["B2"].ToString();
-                                        break;
-                                    }
-                                    if (reader["B1"].ToString().Equals("") && (reader["B2"].ToString().Equals("")))
-                                    {
-                                        tflag = 3;
-                                        book = reader["B2"].ToString();
-                                        break;
-                                    }
+                        tflag = 1;
+                        book = tb1;
+                        
+                    }
+                    else if ((tb2.Equals(RBookAccnoBox.Text)))
+                    {
+                        tflag = 2;
+                        book = tb2;
+                        
+                    }
+                    if (tb1.Equals("") && (tb2.Equals("")))
+                    {
+                        tflag = 3;
+                        book = tb2;//? may not be required. because here student has not borrowed any book
+                        
+                    }
 
-                                }
-                                reader.Close();
-                            }
-                            command.Dispose();
-                        }
-                        connection.Close();
-                    }// closing using
+
+                    ////////////sql = "SELECT * FROM " + TableName + " WHERE USN = '" + RUSNBox.Text + "'";
+                    ////////////using (var connection = new SQLiteConnection("Data Source=BOOKMARK_DB.sqlite;Version=3;New=True;Compress=True;"))
+                    ////////////{
+                    ////////////    connection.Open();
+                    ////////////    using (var command = new SQLiteCommand(sql, connection))
+                    ////////////    {
+                    ////////////        using (var reader = command.ExecuteReader())
+                    ////////////        {
+                    ////////////            while (reader.Read())
+                    ////////////            {
+                    ////////////                if ((reader["B1"].ToString().Equals(RBookAccnoBox.Text)))
+                    ////////////                {
+                    ////////////                    tflag = 1;
+                    ////////////                    book = reader["B1"].ToString();
+                    ////////////                    break;
+                    ////////////                }
+                    ////////////                else if ((reader["B2"].ToString().Equals(RBookAccnoBox.Text)))
+                    ////////////                {
+                    ////////////                    tflag = 2;
+                    ////////////                    book = reader["B2"].ToString();
+                    ////////////                    break;
+                    ////////////                }
+                    ////////////                if (reader["B1"].ToString().Equals("") && (reader["B2"].ToString().Equals("")))
+                    ////////////                {
+                    ////////////                    tflag = 3;
+                    ////////////                    book = reader["B2"].ToString();
+                    ////////////                    break;
+                    ////////////                }
+
+                    ////////////            }
+                    ////////////            reader.Close();
+                    ////////////        }
+                    ////////////        command.Dispose();
+                    ////////////    }
+                    ////////////    connection.Close();
+                    ////////////}// closing using
                     if (tflag == 3)
                     {
                         MessageBox.Show("STUDENT HAS NOT BORROWED ANY BOOK");
@@ -716,51 +745,62 @@ namespace Bookmark_V3
                         return;
                     }
                     //if all is well RETURN the book 
-                    sql = "UPDATE BOOKS SET USN = \'\' WHERE Accno = \'" + RBookAccnoBox.Text + "\'";
-                    using (var connection = new SQLiteConnection("Data Source=BOOKMARK_DB.sqlite;Version=3;New=True;Compress=True;"))
-                    {
-                        connection.Open();
-                        using (var command = new SQLiteCommand(sql, connection))
-                        {
-                            command.ExecuteNonQuery();
-                            command.Dispose();
-                        }
-                        connection.Close();
-                    }
+
+                    if (!database.Update("BOOKMARK_DB.sqlite", "BOOKS", "USN", null, "Accno", RBookAccnoBox.Text)) MessageBox.Show(database.error_message);
+
+                    ////////////sql = "UPDATE BOOKS SET USN = \'\' WHERE Accno = \'" + RBookAccnoBox.Text + "\'";
+                    ////////////using (var connection = new SQLiteConnection("Data Source=BOOKMARK_DB.sqlite;Version=3;New=True;Compress=True;"))
+                    ////////////{
+                    ////////////    connection.Open();
+                    ////////////    using (var command = new SQLiteCommand(sql, connection))
+                    ////////////    {
+                    ////////////        command.ExecuteNonQuery();
+                    ////////////        command.Dispose();
+                    ////////////    }
+                    ////////////    connection.Close();
+                    ////////////}
                     if (tflag == 1)
-                        sql = "UPDATE " + TableName + " SET B1 = \'\' WHERE USN = '" + RUSNBox.Text + "';";
+                        if (!database.Update("BOOKMARK_DB.sqlite", TableName, "B1", null, "USN", RUSNBox.Text)) MessageBox.Show(database.error_message);
+                    //sql = "UPDATE " + TableName + " SET B1 = \'\' WHERE USN = '" + RUSNBox.Text + "';";
                     if (tflag == 2)
-                        sql = "UPDATE " + TableName + " SET B2 = \'\' WHERE USN = '" + RUSNBox.Text + "';";
-                    using (var connection = new SQLiteConnection("Data Source=BOOKMARK_DB.sqlite;Version=3;New=True;Compress=True;"))
-                    {
-                        connection.Open();
-                        using (var command = new SQLiteCommand(sql, connection))
-                        {
-                            command.ExecuteNonQuery();
-                            command.Dispose();
-                        }
-                        connection.Close();
-                    }
-                    MessageBox.Show("BOOK RETURNED SUCESSFULLY");
+                        if (!database.Update("BOOKMARK_DB.sqlite", TableName, "B2", null, "USN", RUSNBox.Text)) MessageBox.Show(database.error_message);
+                    ////////////sql = "UPDATE " + TableName + " SET B2 = \'\' WHERE USN = '" + RUSNBox.Text + "';";
+                    ////////////using (var connection = new SQLiteConnection("Data Source=BOOKMARK_DB.sqlite;Version=3;New=True;Compress=True;"))
+                    ////////////{
+                    ////////////    connection.Open();
+                    ////////////    using (var command = new SQLiteCommand(sql, connection))
+                    ////////////    {
+                    ////////////        command.ExecuteNonQuery();
+                    ////////////        command.Dispose();
+                    ////////////    }
+                    ////////////    connection.Close();
+                    ////////////}
+                    MessageBox.Show("BOOK RETURNED SUCESSFULLY");//?
                     RBSearchBtn_Click(sender, e);
                     RSSearchBtn_Click(sender, e);
-                    sql = "UPDATE TRANSACTIONS SET Return_date='" + DateTime.Now.ToShortDateString() + "',Returned_User='" + LogUserLabel.Text + "' WHERE USN='" + RUSNBox.Text + "' AND Book_Id='"+RBookAccnoBox.Text+"';";
-                    using (var connection = new SQLiteConnection("Data Source=BOOKMARK_DB.sqlite;Version=3;New=True;Compress=True;"))
-                    {
-                        connection.Open();
-                        using (var command = new SQLiteCommand(sql, connection))
-                        {
-                            command.ExecuteNonQuery();
-                            command.Dispose();
-                        }
-                        connection.Close();
-                    }                  
+
+
+
+
+                    if (!database.Update("BOOKMARK_DB.sqlite", "TRANSACTIONS", "Return_date", DateTime.Now.ToShortDateString(), "Returned_User", LogUserLabel.Text, "USN", RUSNBox.Text, "Book_Id", RBookAccnoBox.Text)) MessageBox.Show(database.error_message);
+                    ////////////sql = "UPDATE TRANSACTIONS SET Return_date='" + DateTime.Now.ToShortDateString() + "',Returned_User='" + LogUserLabel.Text + "' WHERE USN='" + RUSNBox.Text + "' AND Book_Id='"+RBookAccnoBox.Text+"';";
+                    ////////////using (var connection = new SQLiteConnection("Data Source=BOOKMARK_DB.sqlite;Version=3;New=True;Compress=True;"))
+                    ////////////{
+                    ////////////    connection.Open();
+                    ////////////    using (var command = new SQLiteCommand(sql, connection))
+                    ////////////    {
+                    ////////////        command.ExecuteNonQuery();
+                    ////////////        command.Dispose();
+                    ////////////    }
+                    ////////////    connection.Close();
+                    ////////////}                  
                 }
             }
         }
 
         private void RTClearAllBtn_Click(object sender, EventArgs e)
         {
+            // this button is to clear all text boxes from the form
             RBookAccnoBox.Text = "";
             RUSNBox.Text = "";
             RegularBookTitleLabel.Text = "";
@@ -797,25 +837,28 @@ namespace Bookmark_V3
                 RegularBookTitleLabel.Text = "";
                 RegularBorrowedLabel.Text = "";
             }
-            sql = "SELECT * FROM BOOKS WHERE Accno = '" + BBSBookAccnoBox.Text + "'";
-            using (var connection = new SQLiteConnection("Data Source=BOOKMARK_DB.sqlite;Version=3;New=True;Compress=True;"))
-            {
-                connection.Open();
-                using (var command = new SQLiteCommand(sql, connection))
-                {
-                    using (var reader = command.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            BBSTitleLabel.Text = reader["Title"].ToString();
-                            BBSBorrowedByLabel.Text = reader["USN"].ToString();
-                        }
-                        reader.Close();
-                    }
-                    command.Dispose();
-                }
-                connection.Close();
-            }// closing using
+
+            if (!database.Get("BOOKMARK_DB.sqlite", "BOOKS", "Accno", BBSBookAccnoBox.Text, "Title")) MessageBox.Show(database.error_message); else BBSTitleLabel.Text = database.Result;
+            if (!database.Get("BOOKMARK_DB.sqlite", "BOOKS", "Accno", BBSBookAccnoBox.Text, "USN")) MessageBox.Show(database.error_message); else BBSBorrowedByLabel.Text = database.Result;
+            ////////sql = "SELECT * FROM BOOKS WHERE Accno = '" + BBSBookAccnoBox.Text + "'";
+            ////////using (var connection = new SQLiteConnection("Data Source=BOOKMARK_DB.sqlite;Version=3;New=True;Compress=True;"))
+            ////////{
+            ////////    connection.Open();
+            ////////    using (var command = new SQLiteCommand(sql, connection))
+            ////////    {
+            ////////        using (var reader = command.ExecuteReader())
+            ////////        {
+            ////////            while (reader.Read())
+            ////////            {
+            ////////                BBSTitleLabel.Text = reader["Title"].ToString();
+            ////////                BBSBorrowedByLabel.Text = reader["USN"].ToString();
+            ////////            }
+            ////////            reader.Close();
+            ////////        }
+            ////////        command.Dispose();
+            ////////    }
+            ////////    connection.Close();
+            ////////}// closing using
         }
 
         private void BBSSSearchBtn_Click(object sender, EventArgs e)
@@ -823,134 +866,170 @@ namespace Bookmark_V3
             if (BBSUSNBox.Text.Equals(""))
                 MessageBox.Show("Please select a student");
             else
-            try
+            {
+                string temp = BBSUSNBox.Text.Substring(0, 7);
+                string temp1 = BBSUSNBox.Text;
+                TableName = "STUDENTS_" + temp;
+                if (!database.Get("BOOKMARK_DB.sqlite", TableName, "USN", BBSUSNBox.Text, "BB1")) MessageBox.Show(database.error_message); else array[1] = database.Result;
+                if (!database.Get("BOOKMARK_DB.sqlite", TableName, "USN", BBSUSNBox.Text, "BB2")) MessageBox.Show(database.error_message); else array[2] = database.Result;
+                if (!database.Get("BOOKMARK_DB.sqlite", TableName, "USN", BBSUSNBox.Text, "BB3")) MessageBox.Show(database.error_message); else array[3] = database.Result;
+                if (!database.Get("BOOKMARK_DB.sqlite", TableName, "USN", BBSUSNBox.Text, "BB4")) MessageBox.Show(database.error_message); else array[4] = database.Result;
+                if (!database.Get("BOOKMARK_DB.sqlite", TableName, "USN", BBSUSNBox.Text, "BB5")) MessageBox.Show(database.error_message); else array[5] = database.Result;
+                if (!database.Get("BOOKMARK_DB.sqlite", TableName, "USN", BBSUSNBox.Text, "BB6")) MessageBox.Show(database.error_message); else array[6] = database.Result;
+                if (!database.Get("BOOKMARK_DB.sqlite", TableName, "USN", BBSUSNBox.Text, "BB7")) MessageBox.Show(database.error_message); else array[7] = database.Result;
+                if (!database.Get("BOOKMARK_DB.sqlite", TableName, "USN", BBSUSNBox.Text, "BB8")) MessageBox.Show(database.error_message); else array[8] = database.Result;
+                if (!database.Get("BOOKMARK_DB.sqlite", TableName, "USN", BBSUSNBox.Text, "BB9")) MessageBox.Show(database.error_message); else array[9] = database.Result;
+                if (!database.Get("BOOKMARK_DB.sqlite", TableName, "USN", BBSUSNBox.Text, "BB10")) MessageBox.Show(database.error_message); else array[10] = database.Result;
+                if (!database.Get("BOOKMARK_DB.sqlite", TableName, "USN", BBSUSNBox.Text, "BB11")) MessageBox.Show(database.error_message); else array[11] = database.Result;
+                if (!database.Get("BOOKMARK_DB.sqlite", TableName, "USN", BBSUSNBox.Text, "BB12")) MessageBox.Show(database.error_message); else array[12] = database.Result;
+                if (!database.Get("BOOKMARK_DB.sqlite", TableName, "USN", BBSUSNBox.Text, "BB13")) MessageBox.Show(database.error_message); else array[13] = database.Result;
+                if (!database.Get("BOOKMARK_DB.sqlite", TableName, "USN", BBSUSNBox.Text, "BB14")) MessageBox.Show(database.error_message); else array[14] = database.Result;
+                if (!database.Get("BOOKMARK_DB.sqlite", TableName, "USN", BBSUSNBox.Text, "SName")) MessageBox.Show(database.error_message); else BBSStudNameLabel.Text = database.Result;//geting student name from database and seting that name to the label
+                ////////////////try
+                ////////////////{
+
+                ////////////////        sql = "SELECT * FROM " + TableName + " WHERE USN = '" + BBSUSNBox.Text + "'";
+                ////////////////        using (var connection = new SQLiteConnection("Data Source=BOOKMARK_DB.sqlite;Version=3;New=True;Compress=True;"))
+                ////////////////        {
+                ////////////////            connection.Open();
+                ////////////////            using (var command = new SQLiteCommand(sql, connection))
+                ////////////////            {
+                ////////////////                using (var reader = command.ExecuteReader())
+                ////////////////                {
+                ////////////////                    while (reader.Read())
+                ////////////////                    {
+                ////////////////                        array[1] = reader["BB1"].ToString();
+                ////////////////                        array[2] = reader["BB2"].ToString();
+                ////////////////                        array[3] = reader["BB3"].ToString();
+                ////////////////                        array[4] = reader["BB4"].ToString();
+                ////////////////                        array[5] = reader["BB5"].ToString();
+                ////////////////                        array[6] = reader["BB6"].ToString();
+                ////////////////                        array[7] = reader["BB7"].ToString();
+                ////////////////                        array[8] = reader["BB8"].ToString();
+                ////////////////                        array[9] = reader["BB9"].ToString();
+                ////////////////                        array[10] = reader["BB10"].ToString();
+                ////////////////                        array[11] = reader["BB11"].ToString();
+                ////////////////                        array[12] = reader["BB12"].ToString();
+                ////////////////                        array[13] = reader["BB13"].ToString();
+                ////////////////                        array[14] = reader["BB14"].ToString();
+                ////////////////                    }
+                ////////////////                    reader.Close();
+                ////////////////                }
+                ////////////////                command.Dispose();
+                ////////////////            }
+                ////////////////            connection.Close();
+                ////////////////        }// closing using
+                ////////////////    }
+                ////////////////    catch
+                ////////////////    {
+                ////////////////        MessageBox.Show("Unexpected exception in search student");
+                ////////////////    }
+
+                //re-organizing the array to avoid empty spaces in between
+                int j = 0, i = 0;
+                for (i = 1; i < 14; i++)
                 {
+                    
+                    if (array[i] == "")
                     {
-                        string temp = BBSUSNBox.Text.Substring(0, 7);
-                        string temp1 = BBSUSNBox.Text;
-                        TableName = "STUDENTS_" + temp;
-                    }
-
-                    try
-                    {
-                        sql = "SELECT * FROM " + TableName + " WHERE USN = '" + BBSUSNBox.Text + "'";
-                        using (var connection = new SQLiteConnection("Data Source=BOOKMARK_DB.sqlite;Version=3;New=True;Compress=True;"))
-                        {
-                            connection.Open();
-                            using (var command = new SQLiteCommand(sql, connection))
-                            {
-                                using (var reader = command.ExecuteReader())
-                                {
-                                    while (reader.Read())
-                                    {
-                                        array[1] = reader["BB1"].ToString();
-                                        array[2] = reader["BB2"].ToString();
-                                        array[3] = reader["BB3"].ToString();
-                                        array[4] = reader["BB4"].ToString();
-                                        array[5] = reader["BB5"].ToString();
-                                        array[6] = reader["BB6"].ToString();
-                                        array[7] = reader["BB7"].ToString();
-                                        array[8] = reader["BB8"].ToString();
-                                        array[9] = reader["BB9"].ToString();
-                                        array[10] = reader["BB10"].ToString();
-                                        array[11] = reader["BB11"].ToString();
-                                        array[12] = reader["BB12"].ToString();
-                                        array[13] = reader["BB13"].ToString();
-                                        array[14] = reader["BB14"].ToString();
-                                    }
-                                    reader.Close();
-                                }
-                                command.Dispose();
-                            }
-                            connection.Close();
-                        }// closing using
-                    }
-                    catch
-                    {
-                        MessageBox.Show("Unexpected exception in search student");
-                    }
-                    int j = 0, i = 0;
-                    for (i = 1; i < 14; i++)
-                    {
-                        if (array[i] == "")
-                        {
-                            for (j = i; j < 14; j++)
-                                array[j] = array[j + 1];
-                            array[14] = "";
-                        }
-                    }
-
-
-                    try
-                    {
-                        sql = "SELECT * FROM " + TableName + " WHERE USN = '" + BBSUSNBox.Text + "'";
-                        using (var connection = new SQLiteConnection("Data Source=BOOKMARK_DB.sqlite;Version=3;New=True;Compress=True;"))
-                        {
-                            connection.Open();
-                            using (var command = new SQLiteCommand(sql, connection))
-                            {
-                                using (var reader = command.ExecuteReader())
-                                {
-                                    while (reader.Read())
-                                    {
-                                        BBSStudNameLabel.Text = reader["SName"].ToString();
-                                        BBSBookLabel1.Text = array[1];
-                                        BBSBookLabel2.Text = array[2];
-                                        BBSBookLabel3.Text = array[3];
-                                        BBSBookLabel4.Text = array[4];
-                                        BBSBookLabel5.Text = array[5];
-                                        BBSBookLabel6.Text = array[6];
-                                        BBSBookLabel7.Text = array[7];
-                                        BBSBookLabel8.Text = array[8];
-                                        BBSBookLabel9.Text = array[9];
-                                        BBSBookLabel10.Text = array[10];
-                                        BBSBookLabel11.Text = array[11];
-                                        BBSBookLabel12.Text = array[12];
-                                        BBSBookLabel13.Text = array[13];
-                                        BBSBookLabel14.Text = array[14];
-                                    }
-                                    reader.Close();
-                                }
-                                command.Dispose();
-                            }
-                            connection.Close();
-                        }// closing using
-                    }
-                    catch
-                    {
-                        MessageBox.Show("unexpected exception in search student");
-                    }
-                    try
-                    {
-                        string query = "SELECT * FROM " + TableName + " WHERE USN='" + BBSUSNBox.Text + "';";
-                        sql = @"Data Source=BOOKMARK_DB.sqlite;Version=3;New=True;Compress=True;";
-                        SQLiteConnection con = new SQLiteConnection(sql);
-                        SQLiteCommand cmd = new SQLiteCommand(query, con);
-                        con.Open();
-                        IDataReader reader = cmd.ExecuteReader();
-                        try
-                        {
-                            while (reader.Read())
-                            {
-                                byte[] F = (System.Byte[])reader["Sphoto"];
-                                BBSTSPBox.Image = ByteToImage(F);
-                            }
-                        }
-                        catch
-                        {
-                            MessageBox.Show("Image Error\n");
-                        }
-                        con.Close();
-                    }
-                    catch
-                    {
-                        MessageBox.Show("Error\n");
+                        for (j = i; j < 14; j++)
+                           array[j] = array[j + 1];
+                        array[14] = "";
                     }
                 }
-                catch
-                {
-                   
-                }
+
+                // seting respective values of book in the lables
+                BBSBookLabel1.Text = array[1];
+                BBSBookLabel2.Text = array[2];
+                BBSBookLabel3.Text = array[3];
+                BBSBookLabel4.Text = array[4];
+                BBSBookLabel5.Text = array[5];
+                BBSBookLabel6.Text = array[6];
+                BBSBookLabel7.Text = array[7];
+                BBSBookLabel8.Text = array[8];
+                BBSBookLabel9.Text = array[9];
+                BBSBookLabel10.Text = array[10];
+                BBSBookLabel11.Text = array[11];
+                BBSBookLabel12.Text = array[12];
+                BBSBookLabel13.Text = array[13];
+                BBSBookLabel14.Text = array[14];
+
+
+
+
+                ////////////////////try
+                ////////////////////{
+                ////////////////////        sql = "SELECT * FROM " + TableName + " WHERE USN = '" + BBSUSNBox.Text + "'";
+                ////////////////////        using (var connection = new SQLiteConnection("Data Source=BOOKMARK_DB.sqlite;Version=3;New=True;Compress=True;"))
+                ////////////////////        {
+                ////////////////////            connection.Open();
+                ////////////////////            using (var command = new SQLiteCommand(sql, connection))
+                ////////////////////            {
+                ////////////////////                using (var reader = command.ExecuteReader())
+                ////////////////////                {
+                ////////////////////                    while (reader.Read())
+                ////////////////////                    {
+                ////////////////////                        BBSStudNameLabel.Text = reader["SName"].ToString();
+                ////////////////////                        BBSBookLabel1.Text = array[1];
+                ////////////////////                        BBSBookLabel2.Text = array[2];
+                ////////////////////                        BBSBookLabel3.Text = array[3];
+                ////////////////////                        BBSBookLabel4.Text = array[4];
+                ////////////////////                        BBSBookLabel5.Text = array[5];
+                ////////////////////                        BBSBookLabel6.Text = array[6];
+                ////////////////////                        BBSBookLabel7.Text = array[7];
+                ////////////////////                        BBSBookLabel8.Text = array[8];
+                ////////////////////                        BBSBookLabel9.Text = array[9];
+                ////////////////////                        BBSBookLabel10.Text = array[10];
+                ////////////////////                        BBSBookLabel11.Text = array[11];
+                ////////////////////                        BBSBookLabel12.Text = array[12];
+                ////////////////////                        BBSBookLabel13.Text = array[13];
+                ////////////////////                        BBSBookLabel14.Text = array[14];
+                ////////////////////                    }
+                ////////////////////                    reader.Close();
+                ////////////////////                }
+                ////////////////////                command.Dispose();
+                ////////////////////            }
+                ////////////////////            connection.Close();
+                ////////////////////        }// closing using
+                ////////////////////    }
+                ////////////////////    catch
+                ////////////////////    {
+                ////////////////////        MessageBox.Show("unexpected exception in search student");
+                ////////////////////    }
+
+
+                // geting picture from database as an array and loading it in picture box
+                if (!database.GetImage("BOOKMARK_DB.sqlite", TableName, "USN", BBSUSNBox.Text, "Sphoto")) MessageBox.Show(""+database.error_message); else BBSTSPBox.Image = ByteToImage(database.Picture_Result);
+                
+                ////////////////////try
+                ////////////////////    {
+                ////////////////////        string query = "SELECT * FROM " + TableName + " WHERE USN='" + BBSUSNBox.Text + "';";
+                ////////////////////        sql = @"Data Source=BOOKMARK_DB.sqlite;Version=3;New=True;Compress=True;";
+                ////////////////////        SQLiteConnection con = new SQLiteConnection(sql);
+                ////////////////////        SQLiteCommand cmd = new SQLiteCommand(query, con);
+                ////////////////////        con.Open();
+                ////////////////////        IDataReader reader = cmd.ExecuteReader();
+                ////////////////////        try
+                ////////////////////        {
+                ////////////////////            while (reader.Read())
+                ////////////////////            {
+                ////////////////////                byte[] F = (System.Byte[])reader["Sphoto"];
+                ////////////////////                BBSTSPBox.Image = ByteToImage(F);
+                ////////////////////            }
+                ////////////////////            reader.Close();
+                ////////////////////        }
+                ////////////////////        catch
+                ////////////////////        {
+                ////////////////////            MessageBox.Show("Image Error\n");
+                ////////////////////        }
+                ////////////////////        con.Close();
+                ////////////////////    }
+                ////////////////////    catch
+                ////////////////////    {
+                ////////////////////        MessageBox.Show("Error\n");
+                ////////////////////    }
+            }
+                
             
         }
 
@@ -1581,6 +1660,7 @@ namespace Bookmark_V3
                             byte[] F = (System.Byte[])reader["Fphoto"];
                             FTPBox.Image = ByteToImage(F);
                         }
+                        reader.Close();
                     }
                     catch (Exception ex)
                     {
@@ -1721,6 +1801,7 @@ namespace Bookmark_V3
                                         tflag = 2;
                                         break;
                                     }
+                                    
                                 }
                                 reader.Close();
                             }
@@ -2297,6 +2378,7 @@ namespace Bookmark_V3
                                 byte[] F = (System.Byte[])reader["Sphoto"];
                                 StudentPBox.Image = ByteToImage(F);
                             }
+                            reader.Close();
                         }
                         catch (Exception ex)
                         {
@@ -2530,6 +2612,7 @@ namespace Bookmark_V3
                             byte[] F = (System.Byte[])reader["Fphoto"];
                             SearchFacultyPhotoBox.Image = ByteToImage(F);
                         }
+                        reader.Close();
                     }
                     catch
                     {
@@ -4189,6 +4272,7 @@ namespace Bookmark_V3
                 Fine = Convert.ToInt32(reader["Value"].ToString());
                 break;
             }
+            reader.Close();
             connection.Close();
             connection = new SQLiteConnection("Data Source=BOOKMARK_DB.sqlite;Version=3;New=True;Compress=True;");
             connection.Open();
@@ -4200,6 +4284,7 @@ namespace Bookmark_V3
                 Return = Convert.ToInt32(reader["Value"].ToString());
                 break;
             }
+            reader.Close();
             connection.Close();
         }
 

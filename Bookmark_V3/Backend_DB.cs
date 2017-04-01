@@ -5,8 +5,8 @@ using System.Data.SQLite;
  * certain formatts of using this class
  * 
  
-            if(!database.Get("BOOKMARK_DB.sqlite", "SYSTEM","Id","13", "Value")) MessageBox.Show(database.error_message);
-            else this.LogUserLabel.Text = database.Result;
+            if(!database.Get("BOOKMARK_DB.sqlite", "SYSTEM","Id","13", "Value")) MessageBox.Show(database.error_message);else this.LogUserLabel.Text = database.Result;
+            
             
             if (!database.Update("BOOKMARK_DB.sqlite", "BOOKS", "USN", RUSNBox.Text, "Accno", RBookAccnoBox.Text)) MessageBox.Show(database.error_message);
 
@@ -27,10 +27,11 @@ namespace Bookmark_V3
            // String TableName = "", Parameter1 = "", Parameter2 = "", Parameter3 = "", Parameter4 = "", Parameter5 = "", Parameter6 = "", Parameter7 = "", Parameter8 = "", Parameter9 = "", Parameter10 = "", Parameter11 = "", Parameter12 = "", Parameter13 = "", Parameter14 = "", Parameter15 = "", Parameter16 = "", Parameter17 = "", Parameter18 = "", Parameter19 = "", Parameter20 = "";
            // byte[] pic;
         }
-        public  String error_message;
-        public  String Result;
-        public  String sql;
-        public  Boolean Initialize()
+        public String error_message;
+        public String Result;
+        public byte[] Picture_Result;
+        public String sql;
+        public Boolean Initialize()
         {
             try
             {
@@ -141,7 +142,7 @@ namespace Bookmark_V3
                             {
                                 Result = reader[SqlColumnName].ToString();
                             }
-                            reader.Close();
+                            reader.Dispose();
                         }
                         command.Dispose();
                     }
@@ -155,6 +156,46 @@ namespace Bookmark_V3
             }
             
             return true;
+        }
+        public Boolean GetImage(String source, String TableName, String ColumName, String Parameter, String SqlColumnName)
+        {
+
+            try
+            {
+                sql = "SELECT * FROM " + TableName + " WHERE " + ColumName + " = '" + Parameter + "'";
+                
+                //string query = "SELECT * FROM " + TableName + " WHERE USN='" + BBSUSNBox.Text + "';";
+                //sql = @"Data Source=BOOKMARK_DB.sqlite;Version=3;New=True;Compress=True;";
+                SQLiteConnection con = new SQLiteConnection("Data Source="+ source + ";Version=3;New=True;Compress=True;");
+                // SQLiteCommand cmd = new SQLiteCommand(query, con);
+                SQLiteCommand cmd = new SQLiteCommand(sql, con);
+                con.Open();
+                IDataReader reader = cmd.ExecuteReader();
+                try
+                {
+                    while (reader.Read())
+                    {
+                        Picture_Result = (System.Byte[])reader[SqlColumnName];
+                    }
+                    reader.Close();
+                    cmd.Dispose();
+                    con.Close();
+                    return true;
+                }
+                catch (Exception exp)
+                {
+                    error_message = "IMMAGE ERROR \n\n\n"+exp.ToString();
+                    return false;
+                }
+                
+            }
+            catch(Exception exp)
+            {
+                error_message =  exp.ToString();
+                return false;
+            }
+
+            
         }
         public static void Delete()
         {

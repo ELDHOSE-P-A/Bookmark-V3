@@ -58,7 +58,7 @@ namespace Bookmark_V3
                     //Login success
                     //Log in Successful
                     // Adding details of currently logged in user to the System Table
-                    if (!database.Update("SYSTEM", "Value", userid, "Id", "13"))
+                    if (!database.Update("BOOKMARK_DB.sqlite", "SYSTEM", "Value", userid, "Id", "13"))
                     {
                         MessageBox.Show("" + database.error_message);
                     }
@@ -85,9 +85,9 @@ namespace Bookmark_V3
         {
             if (AdminNameBox.Text != "" && AdminPasswordBox.Text != "")
             {
-                if (!database.Update("SYSTEM", "Value", AdminNameBox.Text, "Id", "1"))
+                if (!database.Update("BOOKMARK_DB.sqlite", "SYSTEM", "Value", AdminNameBox.Text, "Id", "1"))
                     MessageBox.Show("" + database.error_message); 
-                if (!database.Update("SYSTEM", "Value", AdminPasswordBox.Text, "Id", "2"))
+                if (!database.Update("BOOKMARK_DB.sqlite", "SYSTEM", "Value", AdminPasswordBox.Text, "Id", "2"))
                     MessageBox.Show("" + database.error_message);
 
                 MessageBox.Show("Admin added successfully");
