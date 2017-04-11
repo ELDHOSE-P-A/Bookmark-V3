@@ -13,6 +13,13 @@ using System.Data.SQLite;
 
 
 
+  geting picture from database as an array and loading it in picture box
+  if (!database.GetImage("BOOKMARK_DB.sqlite", TableName, "USN", BBSUSNBox.Text, "Sphoto")) MessageBox.Show(""+database.error_message); else BBSTSPBox.Image = ByteToImage(database.Picture_Result);
+                
+
+
+
+
 
 
 
@@ -159,7 +166,6 @@ namespace Bookmark_V3
         }
         public Boolean GetImage(String source, String TableName, String ColumName, String Parameter, String SqlColumnName)
         {
-
             try
             {
                 sql = "SELECT * FROM " + TableName + " WHERE " + ColumName + " = '" + Parameter + "'";
@@ -187,15 +193,12 @@ namespace Bookmark_V3
                     error_message = "IMMAGE ERROR \n\n\n"+exp.ToString();
                     return false;
                 }
-                
             }
             catch(Exception exp)
             {
                 error_message =  exp.ToString();
                 return false;
             }
-
-            
         }
         public static void Delete()
         {
